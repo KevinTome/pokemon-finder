@@ -5,6 +5,7 @@
     data(){
       return{
         isActive: true,
+        pokeEvo: '',
         inputInfo: '',
         pokemonData: '',
         nameInfo: 'Name',
@@ -25,7 +26,8 @@
           this.pokemonData = response.data;
 
           this.isActive = false;
-          this.nameInfo = this.pokemonData.name;
+          this.pokeEvo = this.pokemonData.id;
+          this.nameInfo = this.pokemonData.name.charAt(0).toUpperCase() + this.pokemonData.name.slice(1);
           this.typeInfo = this.pokemonData.types[0].type.name; //[ERR]more than one type
           this.imgSrc = this.pokemonData.sprites.front_default;
           this.hpStats = this.pokemonData.stats[0].base_stat;
@@ -58,7 +60,7 @@
       </div>
       <div v-bind:class="{hide: isActive}" class="poke-data">
         <div class="poke-title-info">
-          <h2 class="hovertext poke-name" data-hover="Name">{{ nameInfo }}</h2>
+          <h2 class="hovertext poke-name" :data-hover="pokeEvo">{{ nameInfo }}</h2>
           <p class="hovertext type" data-hover="Type">{{ typeInfo }}</p>  
         </div>
         <div class="poke-sprites">
@@ -67,26 +69,26 @@
         <div class="poke-stats-info">
           <div class="row-stats">
             <div class="hovertext" data-hover="HP">
-              <i class="fa-solid fa-heart" id="poke-hp"> {{ hpStats }}</i>
+              <i class="fa-solid fa-heart" id="poke-hp"><p class="stats">{{ hpStats }}</p></i>
             </div>
             <div class="hovertext" data-hover="Attack">
-              <i class="fa-solid fa-fire-flame-simple" id="poke-atk"> {{ atkStats }}</i>
+              <i class="fa-solid fa-fire-flame-simple" id="poke-atk"><p class="stats">{{ atkStats }}</p></i>
             </div>
           </div>
           <div class="row-stats">
             <div class="hovertext" data-hover="Defense">
-              <i class="fa-solid fa-shield-halved" id="poke-def"> {{ defStats }}</i>
+              <i class="fa-solid fa-shield-halved" id="poke-def"><p class="stats">{{ defStats }}</p></i>
             </div>
             <div class="hovertext" data-hover="Special Attack">
-              <i class="fa-solid fa-fire" id="poke-satk"> {{ satkStats }}</i>
+              <i class="fa-solid fa-fire" id="poke-satk"><p class="stats">{{ satkStats }}</p></i>
             </div>
           </div>
           <div class="row-stats">
             <div class="hovertext" data-hover="Special Defense">
-              <i class="fa-solid fa-shield" id="poke-sdef"> {{ sdefStats }}</i>
+              <i class="fa-solid fa-shield" id="poke-sdef"><p class="stats">{{ sdefStats }}</p></i>
             </div>
             <div class="hovertext" data-hover="Speed">
-              <i class="fa-solid fa-wind" id="poke-spd"> {{ spdStats }}</i>
+              <i class="fa-solid fa-wind" id="poke-spd"><p class="stats">{{ spdStats }}</p></i>
             </div>
             
           </div>
@@ -105,15 +107,13 @@ main{
   justify-content: center;
   align-items: center;
   background: #5a07a8;
-  background: linear-gradient(180deg, rgba(90,7,168,1) 0%, rgba(0,0,0,1) 100%);
+  background: linear-gradient(180deg, rgba(90,7,168,1) 0%, rgb(29, 0, 56) 100%);
 }
 .container{
   background-color: blueviolet;
   width: 90%;
   max-width: 450px;
-  /* height: 45%; */
-  aspect-ratio: 1;
-  border-radius: 5%;
+  border-radius: 1em;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -187,13 +187,14 @@ main{
   width: 10em;
   border-radius: 50%;
   border: .1em dashed black;
+  background-color: #0000001c;
 }
 .poke-stats-info{
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 3em;
-  margin: 1em 0;
+  gap: 1em;
+  margin: .5em 0;
 }
 .row-stats{
   display: flex;
@@ -223,5 +224,8 @@ main{
 .hovertext:hover:before {
   opacity: 1;
   visibility: visible;
+}
+.stats{
+  padding-left: 1em;
 }
 </style>
