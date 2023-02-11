@@ -1,13 +1,18 @@
 <script lang="ts">
-  import axios from 'axios';
+  import { EMPTY_ARR } from '@vue/shared';
+import axios from 'axios';
   
   export default{
     data(){
       return{
-        isActive: true,
+        isActiveData: true,
+        isActiveBtn: false,
         pokeEvo: '',
+        pokeEvoName: '',
+        evoIndex: '',
         inputInfo: '',
         pokemonData: '',
+        pokemonIndex: '',
         nameInfo: 'Name',
         typeInfo: 'Type',
         imgSrc: '',
@@ -21,12 +26,13 @@
     },
     methods: {
       search(e: string) {
-        axios.get(`https://pokeapi.co/api/v2/pokemon/${this.inputInfo.toLowerCase()}`)
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${e.toLowerCase()}`)
         .then((response) => {
           this.pokemonData = response.data;
 
-          this.isActive = false;
-          this.pokeEvo = this.pokemonData.id;
+          this.isActiveData = false;
+          this.searchEv(e.toLowerCase());
+          this.pokemonIndex = this.pokemonData.id; 
           this.nameInfo = this.pokemonData.name.charAt(0).toUpperCase() + this.pokemonData.name.slice(1);
           this.typeInfo = this.pokemonData.types[0].type.name; //[ERR]more than one type
           this.imgSrc = this.pokemonData.sprites.front_default;
@@ -40,6 +46,46 @@
         .catch((err) => {
           alert("There's not a Pokemon with that name, try again!")
         });
+      },
+      searchEv(e:string) {
+        axios.get(`https://pokeapi.co/api/v2/pokemon-species/${e}`)
+        .then((response) => {
+          let evolutionChain = response.data.evolution_chain.url; 
+          this.evoIndex = evolutionChain.slice(42).slice(0,-1)
+          console.log(this.evoIndex) 
+          this.evoChainIndex();
+        });
+      },
+      evoChainIndex() {
+        axios.get(`https://pokeapi.co/api/v2/evolution-chain/${this.evoIndex}`)
+        .then((response) => {
+          this.pokeEvo = response.data;
+
+          if(this.pokeEvo.chain.evolves_to.length == 0){
+            //ckeck if there's an evolution
+            console.log('No evolution')
+            this.pokeEvoName = "No evolution" 
+            this.isActiveBtn = true;
+          } 
+          else if (this.pokeEvo.chain.evolves_to[0].species.name == this.nameInfo.toLowerCase()){
+            //get first evolution
+            console.log('last evolution')
+            this.pokeEvoName = this.pokeEvo.chain.evolves_to[0].evolves_to[0].species.name;
+            this.isActiveBtn = false;
+          } 
+          else if(this.pokeEvo.chain.evolves_to[0].evolves_to[0].species.name == this.nameInfo.toLowerCase()) {
+            //second evolution
+            console.log('No evolution')
+            this.pokeEvoName = "No evolution"
+            this.isActiveBtn = true;
+          }
+          else {
+            //get first form
+            console.log('first evolution')
+            this.pokeEvoName = this.pokeEvo.chain.evolves_to[0].species.name;
+            this.isActiveBtn = false;
+          }
+        })
       }
     }
   };
@@ -54,17 +100,20 @@
         <div class="form-input-container">
           <input type="text" v-model="inputInfo" placeholder="type any pokemon name" id="pokemon-name">
           <button class="search" @click="search(inputInfo)">
-            <i class="fa-solid fa-magnifying-glass input-button"></i>
+            <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </div>
       </div>
-      <div v-bind:class="{hide: isActive}" class="poke-data">
+      <div v-bind:class="{hideData: isActiveData}" class="poke-data">
         <div class="poke-title-info">
-          <h2 class="hovertext poke-name" :data-hover="pokeEvo">{{ nameInfo }}</h2>
+          <h2 class="hovertext poke-name" :data-hover="pokemonIndex">{{ nameInfo }}</h2>
           <p class="hovertext type" data-hover="Type">{{ typeInfo }}</p>  
         </div>
         <div class="poke-sprites">
           <img :src="imgSrc" alt="Image" class="poke-img">
+          <button v-bind:class="{hideBtn: isActiveBtn}" class="searchEvol hovertext" @click="search(pokeEvoName)" :data-hover="pokeEvoName">
+            <i class="fa-solid fa-dna"></i>
+          </button>
         </div>
         <div class="poke-stats-info">
           <div class="row-stats">
@@ -154,7 +203,22 @@ main{
   cursor: pointer;
   border-radius: 1em;
 }
-.hide{
+.searchEvol{
+  min-width: 4em;
+  height: 100%;
+  padding: 0.8rem;
+  margin-left: 8px;
+  background-color: #5a07a8;
+  color: black;
+  border: none;
+  cursor: pointer;
+  border-radius: 1em;
+}
+.hideBtn{
+  background-color: transparent !important;
+  border: .1em dotted black;
+}
+.hideData{
   display: none !important;
 }
 .poke-data{
