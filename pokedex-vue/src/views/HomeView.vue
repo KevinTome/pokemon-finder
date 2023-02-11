@@ -1,27 +1,57 @@
 <script lang="ts">
-  import { EMPTY_ARR } from '@vue/shared';
+
 import axios from 'axios';
-  
+  declare interface PokemonData{
+    id: number;
+    stats: Array<{
+      base_stat: number;
+    }>
+    name: string;
+    types: Array<{
+      type: {
+        name: string;
+      }
+    }>
+    sprites: {
+      front_default: string;
+    }
+  }  
+
+  declare interface PokeEvo{
+    chain: {
+      evolves_to: Array<{
+        species: {
+          name: string
+        },
+        evolves_to: Array<{
+          species: {
+            name: string
+          }
+        }>
+      }>
+    }
+  }
+
   export default{
     data(){
       return{
         isActiveData: true,
         isActiveBtn: false,
-        pokeEvo: '',
+        pokeEvo: {} as PokeEvo,
         pokeEvoName: '',
         evoIndex: '',
         inputInfo: '',
-        pokemonData: '',
-        pokemonIndex: '',
-        nameInfo: 'Name',
-        typeInfo: 'Type',
+        pokemonData: {} as PokemonData,
+        pokemonIndex: 0,
+        nameInfo: '',
+        typeInfo: '',
         imgSrc: '',
-        hpStats: 'HP',
-        atkStats: 'Atk',
-        defStats: 'Def',
-        satkStats: 'SAtk',
-        sdefStats: 'SDef',
-        spdStats: 'Spd'
+        hpStats: 0,
+        atkStats: 0,
+        defStats: 0,
+        satkStats: 0,
+        sdefStats: 0,
+        spdStats: 0
       };
     },
     methods: {
@@ -93,7 +123,7 @@ import axios from 'axios';
 </script>
 
 <template>
-  <main>
+  <div class="main">
     <div class="container">
       <div class="form">
         <h3>Search your Pokemon here:</h3>
@@ -144,14 +174,14 @@ import axios from 'axios';
         </div>
       </div>
     </div>    
-  </main>
+  </div>
 </template>
 
 <style scoped>
 
-main{
+.main{
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
